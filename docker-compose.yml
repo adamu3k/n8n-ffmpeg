@@ -37,6 +37,8 @@ services:
       - N8N_PROTOCOL=http
       - NODE_ENV=production
       - WEBHOOK_URL=https://${N8N_HOST}/
+      
+      - N8N_ENABLE_EXECUTE_COMMAND_NODE=true
 
       - GENERIC_TIMEZONE=${GENERIC_TIMEZONE}
       - TZ=${GENERIC_TIMEZONE}
