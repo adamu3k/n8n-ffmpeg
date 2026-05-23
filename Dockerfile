@@ -1,12 +1,21 @@
-FROM n8nio/n8n:latest
+FROM node:20-bookworm
 
-USER root
-
+# Install ffmpeg and tools
 RUN apt-get update && apt-get install -y \
     ffmpeg \
-    bash \
     curl \
     git \
+    bash \
     && rm -rf /var/lib/apt/lists/*
 
-USER node
+# Install n8n globally
+RUN npm install -g n8n
+
+# Create n8n folder
+RUN mkdir /data
+
+WORKDIR /data
+
+EXPOSE 5678
+
+CMD ["n8n"]
