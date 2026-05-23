@@ -1,0 +1,65 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:16
+
+    restart: always
+
+    environment:
+      - POSTGRES_USER=n8n
+      - POSTGRES_PASSWORD=n8npassword
+      - POSTGRES_DB=n8n
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  n8n:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    restart: always
+
+    ports:
+      - "5678:5678"
+
+    environment:
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=postgres
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_DATABASE=n8n
+      - DB_POSTGRESDB_USER=n8n
+      - DB_POSTGRESDB_PASSWORD=n8npassword
+
+      - N8N_HOST=${N8N_HOST}
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - NODE_ENV=production
+      - WEBHOOK_URL=https://${N8N_HOST}/
+
+      - GENERIC_TIMEZONE=${GENERIC_TIMEZONE}
+      - TZ=${GENERIC_TIMEZONE}
+
+      - N8N_SECURE_COOKIE=false
+
+      # Enable Execute Command + FFmpeg support
+      - N8N_COMMUNITY_PACKAGES_ENABLED=true
+      - N8N_RUNNERS_ENABLED=true
+      - NODE_FUNCTION_ALLOW_EXTERNAL=*
+      - EXECUTIONS_PROCESS=main
+
+      # FFmpeg binary path
+      - FFMPEG_PATH=/usr/bin/ffmpeg
+
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - local_files:/files
+
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
+  n8n_data:
+  local_files:
